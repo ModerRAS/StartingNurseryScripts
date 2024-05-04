@@ -15,16 +15,6 @@ namespace StartingNurseryScript.Common {
             this.imagePath = imagePath;
         }
 
-        public Point GetCenter(Point[] points) {
-            var sum = new Point();
-            foreach (var e in points) {
-                sum.X += e.X;
-                sum.Y += e.Y;
-            }
-            sum.X /= points.Length;
-            sum.Y /= points.Length;
-            return sum;
-        }
 
         public List<Point[]> DetectAndDrawSquare(string outputPath) {
             // 读取图像

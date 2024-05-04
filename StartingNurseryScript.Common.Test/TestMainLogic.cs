@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenCvSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,6 +43,40 @@ namespace StartingNurseryScript.Common.Test {
             var map = Calculate.GenerateMap(TestData);
             var (bestStep, bestMap) = Calculate.CalculateBestScoreGreedyAlgorithm(map);
             Console.WriteLine(bestStep.Count);
+        }
+        [TestMethod]
+        public void ConstructMap_Test() {
+            // 创建一些 NumberPhoto 对象
+            var numberPhotos = new List<NumberPhoto> {
+                new NumberPhoto { Points = new[] { new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10) }, Number = 1 },
+                new NumberPhoto { Points = new[] { new Point(15, 0), new Point(25, 0), new Point(25, 10), new Point(15, 10) }, Number = 2 },
+                new NumberPhoto { Points = new[] { new Point(30, 0), new Point(40, 0), new Point(40, 10), new Point(30, 10) }, Number = 3 },
+                new NumberPhoto { Points = new[] { new Point(0, 15), new Point(10, 15), new Point(10, 25), new Point(0, 25) }, Number = 4 },
+                new NumberPhoto { Points = new[] { new Point(15, 15), new Point(25, 15), new Point(25, 25), new Point(15, 25) }, Number = 5 },
+                new NumberPhoto { Points = new[] { new Point(30, 15), new Point(40, 15), new Point(40, 25), new Point(30, 25) }, Number = 6 },
+                new NumberPhoto { Points = new[] { new Point(0, 30), new Point(10, 30), new Point(10, 40), new Point(0, 40) }, Number = 7 },
+                new NumberPhoto { Points = new[] { new Point(15, 30), new Point(25, 30), new Point(25, 40), new Point(15, 40) }, Number = 8 },
+                new NumberPhoto { Points = new[] { new Point(30, 30), new Point(40, 30), new Point(40, 40), new Point(30, 40) }, Number = 9 }
+            };
+
+            int[,] expectedMap =
+            {
+            { 1, 2, 3 },
+            { 4, 5, 6 },
+            { 7, 8, 9 }
+        };
+
+            int[,] map = MainLogic.ConstructMap(numberPhotos);
+
+            // 调试输出实际生成的二维数组的大小
+            Console.WriteLine("Actual map dimensions: {0}x{1}", map.GetLength(0), map.GetLength(1));
+
+            // 调试输出期望的二维数组的大小
+            Console.WriteLine("Expected map dimensions: {0}x{1}", expectedMap.GetLength(0), expectedMap.GetLength(1));
+
+
+            // 断言两个二维数组相等
+            CollectionAssert.AreEqual(expectedMap, map);
         }
     }
 }

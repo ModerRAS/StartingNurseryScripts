@@ -21,4 +21,13 @@
     <ProjectReference Include="..\StartingNurseryScript.Common\StartingNurseryScript.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="TestData\Numbers\718.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Numbers\719.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

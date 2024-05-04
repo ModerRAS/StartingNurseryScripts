@@ -85,6 +85,7 @@ namespace StartingNurseryScript.Common {
             return score;
         }
         public static List<MapRect> GetOrCopyMapRect(List<MapRect> rects) => rects != null ? new List<MapRect>(rects.Select(item => (MapRect)item.Clone())) : new List<MapRect>();
+        #region DFS
         public static (List<MapRect>, int[,]) CalculateBestScoreDFS(int[,] Map, List<MapRect> rects = null) {
             var Scores = new List<(List<MapRect>, int[,])>();
             Parallel.For(0, Map.GetLength(0), StartY => {
@@ -123,13 +124,15 @@ namespace StartingNurseryScript.Common {
             }
             return MaxScores;
         }
-
+        #endregion
+        #region GreedyAlgorithm
         public static (List<MapRect>, int[,]) CalculateBestScoreGreedyAlgorithm(int[,] Map) {
             var TmpMap = Copy2DArray(Map);
             var Score = new List<MapRect>();
             var ScoreLength = Score.Count;
             var MaxX = TmpMap.GetLength(1);
             var MaxY = TmpMap.GetLength(0);
+            var NCount = 0;
             while (true) {
                 for (var MaxOffset = 0; MaxOffset < (MaxX > MaxY ? MaxX : MaxY); MaxOffset++) {
                     var MaxOffsetX = (MaxX < MaxOffset ? MaxX : MaxOffset);
@@ -162,7 +165,7 @@ namespace StartingNurseryScript.Common {
                                         if (IsValidRect(rect, TmpMap)) {
                                             TmpMap = SetValidRectRaw(rect, TmpMap);
                                             Score.Add(rect);
-                                            goto NextPoint;
+                                            //goto NextPoint;
                                         }
                                     }
                                 }
@@ -176,6 +179,9 @@ namespace StartingNurseryScript.Common {
                 }
 
                 if (Score.Count == ScoreLength) {
+                    NCount++;
+                } 
+                if (NCount > 3) {
                     break;
                 } else {
                     ScoreLength = Score.Count;
@@ -185,5 +191,6 @@ namespace StartingNurseryScript.Common {
             Console.WriteLine(OutScore);
             return (Score, TmpMap);
         }
+        #endregion
     }
 }

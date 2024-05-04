@@ -28,7 +28,10 @@ namespace StartingNurseryScript.Common.Test {
         };
         [TestMethod]
         public void TestMainLogic_1() {
-            var main = new MainLogic();
+
+            string adbPath = @"C:\Program Files (x86)\Android\android-sdk\platform-tools\adb.exe";
+            string deviceSerial = "192.168.121.223:39581";
+            var main = new MainLogic(adbPath, deviceSerial);
             main.ExecuteAsync().Wait();
         }
 
@@ -66,7 +69,7 @@ namespace StartingNurseryScript.Common.Test {
             { 7, 8, 9 }
         };
 
-            int[,] map = MainLogic.ConstructMap(numberPhotos);
+            int[,] map = MainLogic.ConstructMap(ref numberPhotos);
 
             // 调试输出实际生成的二维数组的大小
             Console.WriteLine("Actual map dimensions: {0}x{1}", map.GetLength(0), map.GetLength(1));
@@ -77,6 +80,57 @@ namespace StartingNurseryScript.Common.Test {
 
             // 断言两个二维数组相等
             CollectionAssert.AreEqual(expectedMap, map);
+        }
+
+        [TestMethod]
+        public void ConstructMap_Test_2() {
+            // 创建一些 NumberPhoto 对象
+            var numberPhotos = new List<NumberPhoto> {
+                new NumberPhoto { Points = new[] { new Point(0, 0), new Point(10, 0), new Point(10, 10), new Point(0, 10) }, Number = 1 },
+                new NumberPhoto { Points = new[] { new Point(15, 0), new Point(25, 0), new Point(25, 10), new Point(15, 10) }, Number = 2 },
+                new NumberPhoto { Points = new[] { new Point(0, 15), new Point(10, 15), new Point(10, 25), new Point(0, 25) }, Number = 4 },
+                new NumberPhoto { Points = new[] { new Point(15, 15), new Point(25, 15), new Point(25, 25), new Point(15, 25) }, Number = 5 },
+                new NumberPhoto { Points = new[] { new Point(0, 30), new Point(10, 30), new Point(10, 40), new Point(0, 40) }, Number = 7 },
+                new NumberPhoto { Points = new[] { new Point(15, 30), new Point(25, 30), new Point(25, 40), new Point(15, 40) }, Number = 8 }
+            };
+
+            int[,] expectedMap =
+            {
+            { 1, 2 },
+            { 4, 5 },
+            { 7, 8 }
+        };
+
+            int[,] map = MainLogic.ConstructMap(ref numberPhotos);
+
+            // 调试输出实际生成的二维数组的大小
+            Console.WriteLine("Actual map dimensions: {0}x{1}", map.GetLength(0), map.GetLength(1));
+
+            // 调试输出期望的二维数组的大小
+            Console.WriteLine("Expected map dimensions: {0}x{1}", expectedMap.GetLength(0), expectedMap.GetLength(1));
+
+
+            // 断言两个二维数组相等
+            CollectionAssert.AreEqual(expectedMap, map);
+        }
+
+        [TestMethod]
+        public void TestOpenCVMatchTemplate_1() {
+            var photoByte = File.ReadAllBytes("TestData/Numbers/718.jpg");
+            var photo = new NumberPhoto() {
+                Photo = photoByte,
+            };
+            var number = OpenCVHelper.Detect(photo);
+            Assert.AreEqual(7, number.Number);
+        }
+        [TestMethod]
+        public void TestOpenCVMatchTemplate_2() {
+            var photoByte = File.ReadAllBytes("TestData/Numbers/719.jpg");
+            var photo = new NumberPhoto() {
+                Photo = photoByte,
+            };
+            var number = OpenCVHelper.Detect(photo);
+            Assert.AreEqual(2, number.Number);
         }
     }
 }

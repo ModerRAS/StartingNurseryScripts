@@ -51,8 +51,48 @@ public static class OpenCVHelper {
         // 返回对应的数字
         return templateImages.ElementAt(bestMatchIndex).Key;
     }
+
+    static int FindBestMatchingTemplate(Mat sourceImage) {
+        // 记录每张模板图像的匹配结果
+        Dictionary<int, double> matchScores = new ();
+
+        // 循环匹配每张模板图像
+        foreach (var templateImage in templateImages) {
+            // 创建结果图像
+            Mat resultImage = new Mat();
+            
+            // 进行模板匹配
+            Cv2.MatchTemplate(
+                sourceImage.CvtColor(ColorConversionCodes.BGR2HSV),
+                templateImage.Value.CvtColor(ColorConversionCodes.BGR2HSV), 
+                resultImage,
+                TemplateMatchModes.CCoeffNormed
+            );
+
+            // 归一化处理
+            //Cv2.Normalize(resultImage, resultImage, 0, 1, NormTypes.MinMax, MatType.CV_32F);
+
+            // 获取最大值位置
+            double minValue, maxValue;
+            Point minLocation, maxLocation;
+            Cv2.MinMaxLoc(resultImage, out minValue, out maxValue, out minLocation, out maxLocation);
+
+            // 记录匹配分数
+            matchScores.Add(templateImage.Key, maxValue);
+        }
+
+        var max = matchScores.First();
+        foreach (var e in matchScores) {
+            if (e.Value > max.Value) {
+                max = e;
+            }
+        }
+        // 返回最匹配的模板图像
+        return max.Key;
+    }
+
     public static NumberPhoto Detect(NumberPhoto image) {
-        var number = MatchToBestTemplate(Mat.FromImageData(image.Photo));
+        var number = FindBestMatchingTemplate(Mat.FromImageData(image.Photo));
         return new NumberPhoto() {
             Number = number,
             Photo = image.Photo,

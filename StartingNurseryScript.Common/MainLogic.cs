@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace StartingNurseryScript.Common {
     public class MainLogic {
-        public static int[,] ConstructMap(List<NumberPhoto> numberPhotos) {
+        public AdbWrapper adbWrapper { get; set; }
+        public MainLogic(string adbPath, string deviceSerial) {
+            adbWrapper = new AdbWrapper(adbPath, deviceSerial);
+        }
+        public static int[,] ConstructMap(ref List<NumberPhoto> numberPhotos) {
             // 根据 Center 点的 Y 坐标分组，Y 坐标差在 10 以内的为同一行
             var rows = new List<List<NumberPhoto>>();
             foreach (var np in numberPhotos) {
@@ -41,6 +46,8 @@ namespace StartingNurseryScript.Common {
                 var row = rows[i];
                 for (int j = 0; j < row.Count; j++) {
                     map[i, j] = row[j].Number;
+                    row[j].Y = i;
+                    row[j].X = j;
                 }
             }
 
@@ -49,8 +56,10 @@ namespace StartingNurseryScript.Common {
 
 
         public async Task ExecuteAsync() {
-            string imagePath = "C:\\Users\\ModerRAS\\Pictures\\IMG_5357.MP4_20240503_131110.422.jpg";
-            string outputPath = "C:\\Users\\ModerRAS\\Pictures\\output.jpg";
+            var imagePath = "screenshot.png";
+            adbWrapper.CaptureScreenshot(imagePath);
+            string outputPath = "output.jpg";
+            var detect = new DetectNumber();
             var square = new SquareDetector(imagePath);
             var squares = square.DetectAndDrawSquare(outputPath);
             var numberPhotos = square.GetSmallImagesAsByteArrays(squares);
@@ -65,8 +74,44 @@ namespace StartingNurseryScript.Common {
                     count++;
                 }
             }
+            var map = ConstructMap(ref outPhotos);
+            for (var y = 0; y < 16; y++) {
+                for (var x = 0; x < 10; x++) {
+                    Console.Write(map[y, x]);
+                    Console.Write(" ");
+                }
+                Console.WriteLine();
+            }
             Console.WriteLine(count);
-            Console.WriteLine(outPhotos);
+            Console.WriteLine(outPhotos.Count);
+
+
+            var (bestStep, bestMap) = Calculate.CalculateBestScoreGreedyAlgorithm(map);
+
+            Console.WriteLine(bestStep.Count);
+            Console.WriteLine(Calculate.CalculateScore(bestMap));
+            foreach (var e in bestStep) {
+                var sourceX = 0;
+                var sourceY = 0;
+                var targetX = 0;
+                var targetY = 0;
+                foreach (var x in outPhotos) {
+                    if (x.X == e.SourceX) {
+                        sourceX = x.Center.X;
+                    }
+                    if (x.Y == e.SourceY) { 
+                        sourceY = x.Center.Y;
+                    }
+                    if (x.X == e.TargetX) {
+                        targetX = x.Center.X;
+                    }
+                    if (x.Y == e.TargetY) { 
+                        targetY = x.Center.Y;
+                    }
+                }
+                adbWrapper.Swipe(sourceX, sourceY, targetX, targetY);
+                await Task.Delay(500);
+            }
         }
 
 

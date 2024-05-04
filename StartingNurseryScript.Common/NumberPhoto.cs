@@ -11,5 +11,7 @@ namespace StartingNurseryScript.Common {
         public byte[] Photo { get; set; }
         public int Number { get; set; } = (int)ErrorNumber.Init;
         public Point Center { get => Utils.GetCenter(Points); }
+        public int Y { get; set; }
+        public int X { get; set; }
     }
 }

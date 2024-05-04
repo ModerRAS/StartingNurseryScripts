@@ -84,7 +84,10 @@ namespace StartingNurseryScript.Common {
                     Cv2.DrawContours(image, new Point[][] { CurvePoints }, 0, Scalar.Red, 2);
 
                     //Cv2.DrawMarker(image, GetCenter(CurvePoints), Scalar.Blue);
-                    FilteredCurves.Add(CurvePoints);
+                    if (Math.Abs(Utils.GetCenter(CurvePoints).X - CurvePoints[0].X) > 20 && 
+                        Math.Abs(Utils.GetCenter(CurvePoints).Y - CurvePoints[0].Y) > 20) {
+                        FilteredCurves.Add(CurvePoints);
+                    }
                 }
             }
 
@@ -103,6 +106,7 @@ namespace StartingNurseryScript.Common {
                 Rect boundingRect = Cv2.BoundingRect(boxes[i]);
                 Mat smallImage = image[boundingRect];
                 // 将图像编码为字节数组
+                //Cv2.ImWrite($"D:\\WorkSpace\\CSharp\\StartingNurseryScript\\TestResults\\Deploy_ModerRAS 20240504T192923\\Out\\{DateTime.Now.Millisecond}.jpg", smallImage);
                 Cv2.ImEncode(".jpg", smallImage, out byte[] imageBytes);
                 imageBytesList.Add(new NumberPhoto { Points = boxes[i], Photo = imageBytes });
             }

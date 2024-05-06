@@ -48,6 +48,14 @@ namespace StartingNurseryScript.Common.Test {
             Console.WriteLine(bestStep.Count);
         }
         [TestMethod]
+        public void TestCalculateWithACO() {
+            var map = Calculate.GenerateMap(TestData);
+            var (bestStep, bestMap) = Calculate.CalculateBestScoreACO(map);
+            Console.WriteLine(bestStep.Count);
+            Console.WriteLine(Calculate.CalculateScore(bestMap));
+            Assert.IsTrue(Calculate.CalculateScore(bestMap) > 110);
+        }
+        [TestMethod]
         public void ConstructMap_Test() {
             // 创建一些 NumberPhoto 对象
             var numberPhotos = new List<NumberPhoto> {

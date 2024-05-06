@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -56,7 +57,8 @@ namespace StartingNurseryScript.Common {
 
 
         public async Task ExecuteAsync() {
-            var imagePath = "screenshot.png";
+            var Name = $"{DateTime.Now.Millisecond}";
+            var imagePath = $"{Name}.png";
             adbWrapper.CaptureScreenshot(imagePath);
             string outputPath = "output.jpg";
             var detect = new DetectNumber();
@@ -74,22 +76,29 @@ namespace StartingNurseryScript.Common {
                     count++;
                 }
             }
+            StringBuilder mapstr = new StringBuilder();
             var map = ConstructMap(ref outPhotos);
             for (var y = 0; y < 16; y++) {
                 for (var x = 0; x < 10; x++) {
                     Console.Write(map[y, x]);
                     Console.Write(" ");
+                    mapstr.Append(map[y, x]);
+                    mapstr.Append(" ");
                 }
                 Console.WriteLine();
+                mapstr.Append('\n');
             }
-            Console.WriteLine(count);
-            Console.WriteLine(outPhotos.Count);
+            File.WriteAllText($"{Name}.txt", mapstr.ToString());
+            Console.WriteLine($"Count is: {count}");
+            Console.WriteLine($"OutPhotos Count: {outPhotos.Count}");
 
 
-            var (bestStep, bestMap) = Calculate.CalculateBestScoreGreedyAlgorithm(map);
+            var (bestStep, bestMap) = Calculate.CalculateBestScoreACO(map);
 
             Console.WriteLine(bestStep.Count);
             Console.WriteLine(Calculate.CalculateScore(bestMap));
+
+            File.WriteAllText($"{Name}.json", JsonConvert.SerializeObject(bestStep));
             foreach (var e in bestStep) {
                 var sourceX = 0;
                 var sourceY = 0;

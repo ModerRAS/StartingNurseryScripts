@@ -29,6 +29,27 @@ namespace StartingNurseryScript.Common {
                 return result;
             }
         }
+        public Point GetStringPoint(byte[] image, string str) {
+            var result = GetOcrResult(image);
+            foreach (var region in result.Regions) {
+                if (region.Text.Equals(str)) {
+                    return new Point() {
+                        X = (int)region.Rect.Center.X,
+                        Y = (int)region.Rect.Center.Y
+                    };
+                }
+            }
+            return new Point() { X = 0, Y = 0 };
+        }
+        public Point GetStartNext(byte[] image) {
+            return GetStringPoint(image, "再次挑战");
+        }
+        public Point GetOk(byte[] image) {
+            return GetStringPoint(image, "确定");
+        }
+        public Point GetStartGame(byte[] image) {
+            return GetStringPoint(image, "开始游戏");
+        }
         public int ConvertToResults(PaddleOcrResult paddleOcrResult) {
             foreach (var region in paddleOcrResult.Regions) {
                 if (int.TryParse(region.Text, out var result)) {

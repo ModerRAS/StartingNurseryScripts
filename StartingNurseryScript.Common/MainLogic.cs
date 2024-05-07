@@ -12,6 +12,10 @@ namespace StartingNurseryScript.Common {
         public MainLogic(string adbPath, string deviceSerial) {
             adbWrapper = new AdbWrapper(adbPath, deviceSerial);
         }
+        public MainLogic(string deviceSerial) {
+            var adbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "adb", "adb.exe");
+            adbWrapper = new AdbWrapper(adbPath, deviceSerial);
+        }
         public static int[,] ConstructMap(ref List<NumberPhoto> numberPhotos) {
             // 根据 Center 点的 Y 坐标分组，Y 坐标差在 10 以内的为同一行
             var rows = new List<List<NumberPhoto>>();
@@ -55,13 +59,39 @@ namespace StartingNurseryScript.Common {
             return map;
         }
 
+        public async Task StartGame() {
+            var detect = new DetectNumber();
+            while (true) {
+                await Task.Delay(5000);
+                adbWrapper.CaptureScreenshot("tmp.jpg");
+                var jpg = File.ReadAllBytes("tmp.jpg");
+                var p = detect.GetStartGame(jpg);
+                if (!(p.X == 0 && p.Y == 0)) {
+                    adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
+                    break;
+                }
+                p = detect.GetStartNext(jpg);
+                if (!(p.X == 0 && p.Y == 0)) {
+                    adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
+                    break;
+                }
+                p = detect.GetOk(jpg);
+                if (!(p.X == 0 && p.Y == 0)) {
+                    adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
+                }
+            }
+
+            await Task.Delay(5000);
+        }
+
 
         public async Task ExecuteAsync() {
+
+            await StartGame();
             var Name = $"{DateTime.Now.Millisecond}";
             var imagePath = $"{Name}.png";
             adbWrapper.CaptureScreenshot(imagePath);
             string outputPath = "output.jpg";
-            var detect = new DetectNumber();
             var square = new SquareDetector(imagePath);
             var squares = square.DetectAndDrawSquare(outputPath);
             var numberPhotos = square.GetSmallImagesAsByteArrays(squares);
@@ -121,6 +151,11 @@ namespace StartingNurseryScript.Common {
                 adbWrapper.Swipe(sourceX, sourceY, targetX, targetY);
                 await Task.Delay(500);
             }
+            await Task.Delay(30000);
+
+            
+            
+            
         }
 
 

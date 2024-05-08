@@ -79,6 +79,10 @@ namespace StartingNurseryScript.Common {
                 if (!(p.X == 0 && p.Y == 0)) {
                     adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
                 }
+                p = detect.GetTip(jpg);
+                if (!(p.X == 0 && p.Y == 0)) {
+                    adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
+                }
             }
 
             await Task.Delay(5000);

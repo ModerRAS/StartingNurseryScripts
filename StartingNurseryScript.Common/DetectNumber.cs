@@ -54,6 +54,9 @@ namespace StartingNurseryScript.Common {
         public Point GetTip(byte[] image) {
             return GetStringPoint(image, "领取");
         }
+        public Point GetIKnow(byte[] image) {
+            return GetStringPoint(image, "知道了");
+        }
         public int ConvertToResults(PaddleOcrResult paddleOcrResult) {
             foreach (var region in paddleOcrResult.Regions) {
                 if (int.TryParse(region.Text, out var result)) {

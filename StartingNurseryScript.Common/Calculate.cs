@@ -371,8 +371,8 @@ namespace StartingNurseryScript.Common {
             Ant.ReInit();
             var currentMaxScore = 0;
             var notUpdateMaxScore = 0;
-            
-            while (notUpdateMaxScore < Environment.ProcessorCount * 100) {
+            var startTime = DateTime.Now;
+            while ((DateTime.Now - startTime).TotalMinutes < 1) {
                 Parallel.For(0, Environment.ProcessorCount, (body) => {
                     var ant = new Ant(Map);
                     ant.Run();

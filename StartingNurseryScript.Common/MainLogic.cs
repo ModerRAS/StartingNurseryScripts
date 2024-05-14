@@ -62,7 +62,7 @@ namespace StartingNurseryScript.Common {
         public async Task StartGame() {
             var detect = new DetectNumber();
             while (true) {
-                await Task.Delay(5000);
+                await Task.Delay(1000);
                 adbWrapper.CaptureScreenshot("tmp.jpg");
                 var jpg = File.ReadAllBytes("tmp.jpg");
                 var p = detect.GetStartGame(jpg);
@@ -80,6 +80,10 @@ namespace StartingNurseryScript.Common {
                     adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
                 }
                 p = detect.GetTip(jpg);
+                if (!(p.X == 0 && p.Y == 0)) {
+                    adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
+                }
+                p = detect.GetIKnow(jpg);
                 if (!(p.X == 0 && p.Y == 0)) {
                     adbWrapper.Swipe(p.X, p.Y, p.X + 1, p.Y + 1);
                 }
@@ -153,9 +157,8 @@ namespace StartingNurseryScript.Common {
                     }
                 }
                 adbWrapper.Swipe(sourceX, sourceY, targetX, targetY);
-                await Task.Delay(500);
+                await Task.Delay(300);
             }
-            await Task.Delay(30000);
 
             
             

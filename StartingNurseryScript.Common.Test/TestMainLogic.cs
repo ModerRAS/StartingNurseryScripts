@@ -140,5 +140,16 @@ namespace StartingNurseryScript.Common.Test {
             var number = OpenCVHelper.Detect(photo);
             Assert.AreEqual(2, number.Number);
         }
+
+        [TestMethod]
+        public void TestPaddleOCR_2() {
+            var photoByte = File.ReadAllBytes("TestData/Next/StartNext.jpg");
+            var photo = new NumberPhoto() {
+                Photo = photoByte,
+            };
+            var detect = new DetectNumber();
+            var next = detect.GetStartNext(photoByte);
+            Assert.IsTrue(next.X != 0);
+        }
     }
 }

@@ -383,6 +383,13 @@ namespace StartingNurseryScript.Common {
                         notUpdateMaxScore++;
                     }
                 });
+                Parallel.ForEach(Ant.Pheromones.Keys, (e) => {
+                    if (Ant.Pheromones[e] > 5) {
+                        Ant.Pheromones[e] -= 5;
+                    } else {
+                        Ant.Pheromones[e] = 1;
+                    }
+                });
             }
             return (Ant.BestRoute, Ant.BestMap);
         }

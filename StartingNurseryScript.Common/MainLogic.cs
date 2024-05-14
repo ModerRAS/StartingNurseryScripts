@@ -93,7 +93,7 @@ namespace StartingNurseryScript.Common {
         }
 
 
-        public async Task ExecuteAsync() {
+        public async Task ExecuteAsync(Action<int> SetScore) {
 
             await StartGame();
             var Name = $"{DateTime.Now.Millisecond}";
@@ -135,6 +135,7 @@ namespace StartingNurseryScript.Common {
 
             Console.WriteLine(bestStep.Count);
             Console.WriteLine(Calculate.CalculateScore(bestMap));
+            SetScore(Calculate.CalculateScore(bestMap));
 
             File.WriteAllText($"{Name}.json", JsonConvert.SerializeObject(bestStep));
             foreach (var e in bestStep) {

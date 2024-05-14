@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reactive;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace StartingNurseryScript.Avalonia.ViewModels;
 
@@ -54,7 +55,6 @@ public class MainViewModel : ViewModelBase
         StopTaskCommand = ReactiveCommand.CreateFromTask(StopTask);
         PairCommand = ReactiveCommand.CreateFromTask(PairTask);
     }
-
     private async Task ReadInput() {
         // 读取输入框的内容
         string input = InputText;
@@ -64,7 +64,9 @@ public class MainViewModel : ViewModelBase
         IsStart = true;
         while (IsStart) {
             var mainlogic = new MainLogic(AdbPath, input);
-            await mainlogic.ExecuteAsync();
+            await mainlogic.ExecuteAsync(new Action<int>((score) => {
+                Greeting += $",此次{score}分";
+            }));
             Count++;
             Greeting = $"已完成{Count}次";
         }
